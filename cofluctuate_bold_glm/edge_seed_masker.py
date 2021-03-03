@@ -12,13 +12,13 @@ from .utils import create_task_confounders
 class NiftiEdgeSeed():
     def __init__(self, 
                  seeds,
-                 radius,
-                 mask_img,
-                 smoothing_fwhm,
-                 detrend,
-                 low_pass,
-                 high_pass, 
-                 t_r,
+                 radius = None,
+                 mask_img = None,
+                 smoothing_fwhm = None,
+                 detrend = None,
+                 low_pass = None,
+                 high_pass = None, 
+                 t_r = None,
                  fir_delays=[0]
                  ):
         

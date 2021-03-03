@@ -34,10 +34,10 @@ class NiftiEdgeAtlas():
     
     def __init__(self, 
                  atlas_file,
-                 detrend,
-                 low_pass,
-                 high_pass, 
-                 t_r,
+                 detrend = False,
+                 low_pass = None,
+                 high_pass= None, 
+                 t_r = None,
                  fir_delays=[0]
                 ):
         

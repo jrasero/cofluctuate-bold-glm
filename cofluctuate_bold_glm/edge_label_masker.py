@@ -79,8 +79,7 @@ class NiftiEdgeAtlas():
         atlas_ts_conf_task = clean(atlas_ts_conf, confounds=task_conf, t_r=self.t_r, detrend=False, standardize='zscore')
     
         edge_ts = compute_edge_ts(atlas_ts_conf_task)
-        edge_img = nib.Nifti1Image(edge_ts, affine=run_img.affine)
-        edge_img.set_data_dtype(run_img.get_data_dtype()) # Use the same data type
+        edge_img = new_img_like(run_img, edge_ts, affine=run_img.affine)
 
         return edge_img
     

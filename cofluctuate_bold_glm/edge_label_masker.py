@@ -68,6 +68,7 @@ class NiftiEdgeAtlas():
         end_time = (n_scans - 1)* self.t_r
         frame_times = np.linspace(start_time, end_time, n_scans)
         task_conf = create_task_confounders(frame_times, events_mat, fir_delays=self.fir_delays)
+        self.task_conf_ = task_conf
         
         label_masker = NiftiLabelsMasker(labels_img=self.atlas_file, 
                                          detrend=self.detrend,
@@ -76,8 +77,10 @@ class NiftiEdgeAtlas():
                                          t_r = self.t_r, 
                                          standardize=False)
         atlas_ts_conf = label_masker.fit_transform(run_img, confounds=confounds)
+        self.atlas_ts_conf_ = atlas_ts_conf.copy()
         atlas_ts_conf_task = clean(atlas_ts_conf, confounds=task_conf, t_r=self.t_r, detrend=False, standardize='zscore')
-    
+        self.atlas_ts_conf_task_ = atlas_ts_conf_task.copy()
+
         edge_ts = compute_edge_ts(atlas_ts_conf_task)
         edge_img = new_img_like(run_img, edge_ts, affine=run_img.affine)
 

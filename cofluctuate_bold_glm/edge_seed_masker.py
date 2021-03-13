@@ -42,7 +42,7 @@ class NiftiEdgeSeed():
         
         # 1- Load and compute FIR events
         task_conf = None
-        if events:
+        if events is not None:
             if type(events)==str:
                 assert os.path.exists(events)
                 assert events.endswith("events.tsv")
@@ -67,7 +67,12 @@ class NiftiEdgeSeed():
                                          t_r = self.t_r,
                                          standardize=False)
         seed_ts_conf = seed_masker.fit_transform(run_img, confounds=confounds)
-        seed_ts_conf_task = denoise_task(X = task_conf, Y = seed_ts_conf)
+        
+        if events is not None:
+            seed_ts_conf_task = denoise_task(X = task_conf, Y = seed_ts_conf)
+        else:
+            seed_ts_conf_task = seed_ts_conf
+            
         seed_ts_zscore = standardize(seed_ts_conf_task)
 
         
@@ -80,7 +85,11 @@ class NiftiEdgeSeed():
                                  t_r = self.t_r, 
                                  standardize=False)
         brain_ts_conf = brain_mask.fit_transform(run_img, confounds=confounds)
-        brain_ts_conf_task = denoise_task(X = task_conf, Y = brain_ts_conf)
+        if events is not None:
+            brain_ts_conf_task = denoise_task(X = task_conf, Y = brain_ts_conf)
+        else:
+            brain_ts_conf_task = brain_ts_conf
+            
         brain_ts_zscore = standardize(brain_ts_conf_task)
         
         # 3- Multiply seed region with brain 

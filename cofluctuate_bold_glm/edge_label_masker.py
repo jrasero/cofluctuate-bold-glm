@@ -58,7 +58,7 @@ class NiftiEdgeAtlas():
         
         # 1- Load and compute FIR events
         task_conf = None
-        if events:
+        if events is not None:
             if type(events)==str:
                 assert os.path.exists(events)
                 assert events.endswith("events.tsv")
@@ -85,7 +85,7 @@ class NiftiEdgeAtlas():
         self.atlas_ts_conf_ = atlas_ts_conf.copy()
         
         # 3- Remove events if passed
-        if events:
+        if events is not None:
             atlas_ts_conf_task = denoise_task(X=task_conf, Y = atlas_ts_conf)
         else:
             atlas_ts_conf_task = atlas_ts_conf.copy()

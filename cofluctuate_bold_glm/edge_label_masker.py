@@ -50,8 +50,8 @@ class NiftiEdgeAtlas():
         
     def fit_transform(self, 
                       run_img, 
-                      events, 
-                      confounds):
+                      events=None, 
+                      confounds=None):
         
         run_img = load_img(run_img)
         n_scans = run_img.shape[3]

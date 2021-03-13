@@ -14,3 +14,27 @@ def create_task_confounders(frame_times, events_df, fir_delays):
         task_conf_reg.append(trial_events_reg)
         
     return np.column_stack(task_conf_reg)
+
+def denoise_task(X, Y):
+    
+    # Compute mean data
+    X_offset = np.mean(X, axis=0)
+    Y_offset = np.mean(Y, axis=0)
+     
+    # Compute coefficients
+    beta, _, _, _ = np.linalg.lstsq(X - X_offset, Y-Y_offset, rcond=None)
+    
+    Y_clean = Y - X @ beta 
+    
+    return Y_clean
+
+def standardize(X):
+    
+    mu = X.mean(axis=0)
+    std = X.std(axis=0)
+    std[std < np.finfo(np.float).eps] = 1.  # avoid numerical problems
+    
+    Z = (X - mu)/std
+    
+    return Z
+        

@@ -2,7 +2,6 @@
 
 from nilearn.input_data import NiftiSpheresMasker, NiftiMasker
 from nilearn.image import load_img, new_img_like
-from nilearn.signal import clean
 import numpy as np
 import pandas as pd
 import os
@@ -10,12 +9,13 @@ import os
 from .utils import create_task_confounders, denoise_task, standardize
 
 class NiftiEdgeSeed():
+    
     def __init__(self, 
                  seeds,
                  radius = None,
                  mask_img = None,
                  smoothing_fwhm = None,
-                 detrend = None,
+                 detrend = False,
                  low_pass = None,
                  high_pass = None, 
                  t_r = None,
@@ -40,22 +40,28 @@ class NiftiEdgeSeed():
         run_img = load_img(run_img)
         n_scans = run_img.shape[3]
         
+        #TODO: See if it makes sense to create a function for this
+        # or a base class that has this method
+        
         # 1- Load and compute FIR events
         task_conf = None
         if events is not None:
-            if type(events)==str:
+            if isinstance(events, str):
                 assert os.path.exists(events)
                 assert events.endswith("events.tsv")
-                events_mat = pd.read_csv(events)
-            else:
-                #TODO: Function to check an input numpy array in the correct form
-                events_mat = events
+                events_mat = pd.read_csv(events, sep="\t")
             
-            start_time = 0
-            end_time = (n_scans - 1)* self.t_r
-            frame_times = np.linspace(start_time, end_time, n_scans)
-            task_conf = create_task_confounders(frame_times, events_mat, 
-                                                fir_delays=self.fir_delays)
+                start_time = 0
+                end_time = (n_scans - 1)* self.t_r
+                frame_times = np.linspace(start_time, end_time, n_scans)
+                task_conf = create_task_confounders(frame_times, events_mat, 
+                                                    fir_delays=self.fir_delays)
+                
+            elif isinstance(events, np.ndarray):
+                # You can supply a given task matrix to denoise
+                task_conf = events
+            
+            
         self.task_conf_ = task_conf
         
         # 2- Get seed region and clean it
@@ -85,6 +91,7 @@ class NiftiEdgeSeed():
                                  t_r = self.t_r, 
                                  standardize=False)
         brain_ts_conf = brain_mask.fit_transform(run_img, confounds=confounds)
+        
         if events is not None:
             brain_ts_conf_task = denoise_task(X = task_conf, Y = brain_ts_conf)
         else:

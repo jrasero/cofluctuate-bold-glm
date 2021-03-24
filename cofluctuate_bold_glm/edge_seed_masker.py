@@ -102,5 +102,5 @@ class NiftiEdgeSeed():
         # 3- Multiply seed region with brain 
         edge_ts = brain_ts_zscore*seed_ts_zscore[:, None]
         
-        edge_ts_img = new_img_like(run_img, edge_ts)
+        edge_ts_img = new_img_like(run_img, edge_ts, affine = np.eye(4))
         return edge_ts_img

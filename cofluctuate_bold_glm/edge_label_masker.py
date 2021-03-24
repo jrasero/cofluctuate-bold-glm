@@ -98,9 +98,8 @@ class NiftiEdgeAtlas():
         # 4-Standardize data 
         atlas_ts_clean =  standardize(atlas_ts_conf_task)
     
-
         edge_ts = compute_edge_ts(atlas_ts_clean)
-        edge_img = new_img_like(run_img, edge_ts, affine=run_img.affine)
+        edge_img = new_img_like(run_img, edge_ts, affine = np.eye(4)) # Add fake affine (old was:run_img.affine)
 
         return edge_img
     

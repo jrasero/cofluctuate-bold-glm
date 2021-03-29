@@ -72,11 +72,13 @@ class NiftiEdgeSeed():
                                          t_r = self.t_r,
                                          standardize = False)
         seed_ts_conf = seed_masker.fit_transform(run_img, confounds=confounds)
+        self.seed_ts_conf_ = seed_ts_conf.copy()
 
         if events is not None:
             seed_ts_conf_task = denoise_task(X = task_conf, Y = seed_ts_conf)
         else:
             seed_ts_conf_task = seed_ts_conf
+        self.seed_ts_conf_task_ = seed_ts_conf_task.copy()
 
         seed_ts_zscore = standardize(seed_ts_conf_task)
 
@@ -89,16 +91,18 @@ class NiftiEdgeSeed():
                                  t_r = self.t_r,
                                  standardize = False)
         brain_ts_conf = brain_mask.fit_transform(run_img, confounds=confounds)
+        self.brain_ts_conf_ = brain_ts_conf.copy()
 
         if events is not None:
             brain_ts_conf_task = denoise_task(X = task_conf, Y = brain_ts_conf)
         else:
             brain_ts_conf_task = brain_ts_conf
+        self.brain_ts_conf_task_ = brain_ts_conf_task.copy()
 
         brain_ts_zscore = standardize(brain_ts_conf_task)
 
         # 3- Multiply seed region with brain
-        edge_ts = brain_ts_zscore*seed_ts_zscore[:, None]
-
-        edge_ts_img = new_img_like(run_img, edge_ts, affine = np.eye(4))
+        edge_ts = brain_ts_zscore*seed_ts_zscore
+        # Resulting data back to img space
+        edge_ts_img = brain_mask.inverse_transform(edge_ts)
         return edge_ts_img
